@@ -146,7 +146,7 @@ export default async function handler(
 
       const randomNftImage = selectRandomNFTImage(data);
 
-      // This if-else block should be inside the handler function
+      // Handle response based on whether a random NFT image is found
       if (randomNftImage) {
         return res.send(createHtmlResponse(randomNftImage));
       } else {
