@@ -158,12 +158,11 @@ export default async function handler(
     res.status(405).send("Method Not Allowed");
   }
 }
-
-function selectRandomNFTImage(data) {
+function selectRandomNFTImage(data: any) {
   let images = [];
   ["Ethereum", "Polygon", "Base", "Zora"].forEach((blockchain) => {
     if (data[blockchain] && data[blockchain].TokenBalance) {
-      data[blockchain].TokenBalance.forEach((token) => {
+      data[blockchain].TokenBalance.forEach((token: any) => {
         if (
           token.tokenNfts &&
           token.tokenNfts.contentValue &&
