@@ -7,7 +7,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 
-import { generateImage } from "~/generateImage";
 import { Metadata } from "next";
 import prisma from "lib/prisma";
 import Link from "next/link";
@@ -34,7 +33,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   const rsvps = await prisma.rSVP.findMany();
-  const image = await generateImage(`The event has ${rsvps.length} RSVPs.`);
 
   const users = await Promise.all(
     rsvps.map(async ({ fid }) => {
