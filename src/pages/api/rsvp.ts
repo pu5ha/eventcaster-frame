@@ -5,10 +5,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 // Import Airstack
-import { init, gql, query } from "@airstack/node";
+import { init, fetchQuery } from "@airstack/node";
 
 // Initialize Airstack with your API key
-init("a3e2d76f7afd4e6bb2202fcc57fd0132Y");
+init("a3e2d76f7afd4e6bb2202fcc57fd0132");
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       }
 
       // Define your GraphQL query here
-      const graphqlQuery = gql`
+      const graphqlQuery = `
       query NFTsOwnedByFarcasterUse($fid: String!) {
         Ethereum: TokenBalances(
           input: {
@@ -137,41 +137,36 @@ export default async function handler(req, res) {
         }
 `;
 
-      // Fetch data using Airstack
-      const { data, errors } = await query(graphqlQuery, { fid }); // Pass the fid variable
+      const { data, error } = await fetchQuery(graphqlQuery, {
+        variables: { fid },
+      });
 
-      if (errors) {
-        console.error(errors);
+      if (error) {
+        console.error(error);
         return res.status(500).send("Error fetching NFT data");
       }
 
       // Process the data to select a random NFT image
       const randomNftImage = selectRandomNFTImage(data);
 
-      // Your response logic...
-      // Use `randomNftImage` in your response
-      if (!errors && data) {
-        const randomNftImage = selectRandomNFTImage(data);
-
-        if (randomNftImage) {
-          // Send response with the random NFT image
-          return res.send(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <title>Your Random NFT</title>
-              <meta property="og:title" content="Your Random NFT">
-              <meta property="og:image" content="${randomNftImage}">
-              <meta name="fc:frame" content="vNext">
-              <meta name="fc:frame:image" content="${randomNftImage}">
-              <meta name="fc:frame:button:1" content="See Another">
-            </head>
-            <body>
-              <p>Your random NFT image is displayed.</p>
-            </body>
-            </html>
-          `);
-        }
+      if (randomNftImage) {
+        // Send response with the random NFT image
+        return res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Your Random NFT</title>
+      <meta property="og:title" content="Your Random NFT">
+      <meta property="og:image" content="${randomNftImage}">
+      <meta name="fc:frame" content="vNext">
+      <meta name="fc:frame:image" content="${randomNftImage}">
+      <meta name="fc:frame:button:1" content="See Another">
+    </head>
+    <body>
+      <p>Your random NFT image is displayed.</p>
+    </body>
+    </html>
+  `);
       }
     } catch (error) {
       console.error(error);
