@@ -1,6 +1,5 @@
 import { init, fetchQuery } from "@airstack/node";
 import type { NextApiRequest, NextApiResponse } from "next";
-import prisma from "lib/prisma";
 
 init("a3e2d76f7afd4e6bb2202fcc57fd0132");
 
@@ -133,7 +132,7 @@ export default async function handler(
             prevCursor
           }
         }
-`;
+`; // your GraphQL query
 
       const { data, error } = await fetchQuery(graphqlQuery, {
         variables: { fid: `fc_fid:${fid}` },
