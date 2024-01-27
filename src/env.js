@@ -16,7 +16,7 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
-    HOST: z.string().default("http://localhost:3000"),
+    HOST: z.string().default("https://eventcaster-frame-zeta.vercel.app/"),
   },
 
   /**
