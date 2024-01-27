@@ -1,6 +1,12 @@
 import { init, fetchQuery } from "@airstack/node";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+interface RequestBody {
+  untrustedData?: {
+    fid?: string;
+  };
+}
+
 init("a3e2d76f7afd4e6bb2202fcc57fd0132");
 
 export default async function handler(
@@ -9,7 +15,9 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     try {
-      const fid = req.body?.untrustedData?.fid;
+      const body = req.body as RequestBody;
+      const fid = body.untrustedData?.fid;
+
       if (!fid) {
         return res.status(400).send("Invalid FID");
       }
@@ -158,28 +166,25 @@ export default async function handler(
     res.status(405).send("Method Not Allowed");
   }
 }
+
+// Define interfaces for your data structure as needed
+
 function selectRandomNFTImage(data: any): string | null {
-  let images: string[] = []; // Explicitly declare the type of the images array
+  const images: string[] = [];
 
   ["Ethereum", "Polygon", "Base", "Zora"].forEach((blockchain) => {
-    if (data[blockchain] && data[blockchain].TokenBalance) {
-      data[blockchain].TokenBalance.forEach((token: any) => {
-        if (
-          token.tokenNfts &&
-          token.tokenNfts.contentValue &&
-          token.tokenNfts.contentValue.image &&
-          token.tokenNfts.contentValue.image.medium
-        ) {
-          images.push(token.tokenNfts.contentValue.image.medium);
-        }
-      });
-    }
+    const tokenBalances = data[blockchain]?.TokenBalance;
+    tokenBalances?.forEach((token: any) => {
+      const imageMedium = token?.tokenNfts?.contentValue?.image?.medium;
+      if (imageMedium) {
+        images.push(imageMedium);
+      }
+    });
   });
 
   if (images.length > 0) {
     const randomIndex = Math.floor(Math.random() * images.length);
-    const selectedImage = images[randomIndex];
-    return selectedImage ? selectedImage : null;
+    return images[randomIndex];
   } else {
     return null;
   }
