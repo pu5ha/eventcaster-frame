@@ -12,23 +12,23 @@ const fontPath = join(process.cwd(), "Roboto-Regular.ttf");
 const fontData = fs.readFileSync(fontPath);
 
 export const revalidate = 0;
+// ... (rest of your imports)
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   try {
-    const rsvps = await prisma.rSVP.count();
-
+    // Use satori to create SVG with the desired message
     const svg = await satori(
       <div
         style={{
-          justifyContent: "flex-start",
+          justifyContent: "center", // Center align the content
           alignItems: "center",
           display: "flex",
           width: "100%",
           height: "100%",
-          backgroundColor: "f4f4f4",
+          backgroundColor: "#f4f4f4", // Ensure this is a valid color value
           padding: 50,
           lineHeight: 1.2,
           fontSize: 24,
@@ -41,8 +41,10 @@ export default async function handler(
             padding: 20,
           }}
         >
-          <h2 style={{ textAlign: "center", color: "lightgray" }}>
-            Event has {rsvps} RSVPs.
+          <h2 style={{ textAlign: "center", color: "#333" }}>
+            {" "}
+            {/* Updated color for better visibility */}
+            Click to show a random NFT you own
           </h2>
         </div>
       </div>,
