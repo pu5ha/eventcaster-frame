@@ -53,7 +53,7 @@ export default async function HomePage() {
           className="text-xl font-bold text-slate-800"
           style={{ fontSize: 36 }}
         >
-          @matthew&apos;s event
+          @jason&apos;s event
         </h1>
         <div className="h-3" />
         <h1 className="text-sm font-medium text-slate-800 opacity-75">
