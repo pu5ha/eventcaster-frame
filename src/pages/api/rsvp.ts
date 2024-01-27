@@ -159,6 +159,31 @@ export default async function handler(
   }
 }
 
+function selectRandomNFTImage(data) {
+  let images = [];
+  ["Ethereum", "Polygon", "Base", "Zora"].forEach((blockchain) => {
+    if (data[blockchain] && data[blockchain].TokenBalance) {
+      data[blockchain].TokenBalance.forEach((token) => {
+        if (
+          token.tokenNfts &&
+          token.tokenNfts.contentValue &&
+          token.tokenNfts.contentValue.image &&
+          token.tokenNfts.contentValue.image.medium
+        ) {
+          images.push(token.tokenNfts.contentValue.image.medium);
+        }
+      });
+    }
+  });
+
+  if (images.length > 0) {
+    const randomIndex = Math.floor(Math.random() * images.length);
+    return images[randomIndex];
+  } else {
+    return null;
+  }
+}
+
 function createHtmlResponse(imageUrl: string) {
   // Function to create the HTML response with the given image URL
   return `
