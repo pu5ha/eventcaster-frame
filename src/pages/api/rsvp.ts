@@ -168,9 +168,8 @@ export default async function handler(
 }
 
 // Define interfaces for your data structure as needed
-
 function selectRandomNFTImage(data: any): string | null {
-  const images: string[] = [];
+  const images: (string | undefined)[] = [];
 
   ["Ethereum", "Polygon", "Base", "Zora"].forEach((blockchain) => {
     const tokenBalances = data[blockchain]?.TokenBalance;
@@ -182,9 +181,14 @@ function selectRandomNFTImage(data: any): string | null {
     });
   });
 
-  if (images.length > 0) {
-    const randomIndex = Math.floor(Math.random() * images.length);
-    return images[randomIndex];
+  // Filter out undefined values
+  const definedImages: string[] = images.filter(
+    (img): img is string => img !== undefined,
+  );
+
+  if (definedImages.length > 0) {
+    const randomIndex = Math.floor(Math.random() * definedImages.length);
+    return definedImages[randomIndex];
   } else {
     return null;
   }
