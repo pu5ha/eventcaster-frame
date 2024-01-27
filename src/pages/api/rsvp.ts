@@ -178,9 +178,10 @@ function selectRandomNFTImage(data: any): string | null {
 
   if (images.length > 0) {
     const randomIndex = Math.floor(Math.random() * images.length);
-    return images[randomIndex];
+    const selectedImage = images[randomIndex];
+    return selectedImage ? selectedImage : null;
   } else {
-    return null; // Explicitly return null if no images are found
+    return null;
   }
 }
 
