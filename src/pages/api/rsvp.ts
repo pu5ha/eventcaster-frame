@@ -1,24 +1,22 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-// Import Airstack
 import { init, fetchQuery } from "@airstack/node";
+import type { NextApiRequest, NextApiResponse } from "next";
+import prisma from "lib/prisma";
 
-// Initialize Airstack with your API key
 init("a3e2d76f7afd4e6bb2202fcc57fd0132");
 
-export default async function handler(req, res) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method === "POST") {
     try {
       const fid = req.body?.untrustedData?.fid;
+
       if (!fid) {
         return res.status(400).send("Invalid FID");
       }
 
-      // Define your GraphQL query here
+      // GraphQL query to fetch NFTs
       const graphqlQuery = `
       query NFTsOwnedByFarcasterUse($fid: String!) {
         Ethereum: TokenBalances(
@@ -137,8 +135,9 @@ export default async function handler(req, res) {
         }
 `;
 
+      // Fetch data from Airstack
       const { data, error } = await fetchQuery(graphqlQuery, {
-        variables: { fid },
+        variables: { fid: `fc_fid:${fid}` },
       });
 
       if (error) {
@@ -146,27 +145,15 @@ export default async function handler(req, res) {
         return res.status(500).send("Error fetching NFT data");
       }
 
-      // Process the data to select a random NFT image
+      // Select a random NFT image from the response
       const randomNftImage = selectRandomNFTImage(data);
 
       if (randomNftImage) {
         // Send response with the random NFT image
-        return res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Your Random NFT</title>
-      <meta property="og:title" content="Your Random NFT">
-      <meta property="og:image" content="${randomNftImage}">
-      <meta name="fc:frame" content="vNext">
-      <meta name="fc:frame:image" content="${randomNftImage}">
-      <meta name="fc:frame:button:1" content="See Another">
-    </head>
-    <body>
-      <p>Your random NFT image is displayed.</p>
-    </body>
-    </html>
-  `);
+        return res.send(createHtmlResponse(randomNftImage));
+      } else {
+        // Handle case where no image is found
+        // ...
       }
     } catch (error) {
       console.error(error);
@@ -182,19 +169,54 @@ function selectRandomNFTImage(data) {
 
   // Extract images from each blockchain's data
   ["Ethereum", "Polygon", "Base", "Zora"].forEach((blockchain) => {
-    data[blockchain]?.TokenBalance.forEach((token) => {
-      if (
-        token.tokenNfts &&
-        token.tokenNfts.contentValue &&
-        token.tokenNfts.contentValue.image
-      ) {
-        // You can choose the size of image you want, e.g., medium
-        images.push(token.tokenNfts.contentValue.image.medium);
-      }
-    });
+    if (data[blockchain] && data[blockchain].TokenBalance) {
+      data[blockchain].TokenBalance.forEach((token) => {
+        if (
+          token.tokenNfts &&
+          token.tokenNfts.contentValue &&
+          token.tokenNfts.contentValue.image &&
+          token.tokenNfts.contentValue.image.medium // Assuming medium is preferred
+        ) {
+          images.push(token.tokenNfts.contentValue.image.medium);
+        }
+      });
+    }
   });
 
-  // Select a random image
-  const randomIndex = Math.floor(Math.random() * images.length);
-  return images[randomIndex];
+  // Select a random image from the array
+  if (images.length > 0) {
+    const randomIndex = Math.floor(Math.random() * images.length);
+    return images[randomIndex];
+  } else {
+    return null; // Return null if no images are found
+  }
+}
+
+// In your handler function, handle the case where no image is found
+if (randomNftImage) {
+  // Send response with the random NFT image
+  return res.send(createHtmlResponse(randomNftImage));
+} else {
+  // Handle case where no image is found
+  return res.status(404).send("No NFT image found for the given FID");
+}
+
+function createHtmlResponse(imageUrl: string) {
+  // Function to create the HTML response with the given image URL
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Your Random NFT</title>
+      <meta property="og:title" content="Your Random NFT">
+      <meta property="og:image" content="${imageUrl}">
+      <meta name="fc:frame" content="vNext">
+      <meta name="fc:frame:image" content="${imageUrl}">
+      <meta name="fc:frame:button:1" content="See Another">
+    </head>
+    <body>
+      <p>Your random NFT image is displayed.</p>
+    </body>
+    </html>
+  `;
 }
