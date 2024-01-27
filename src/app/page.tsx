@@ -63,7 +63,10 @@ export default async function HomePage() {
           Where: farcaster
         </h1>
         <div className="h-3" />
-        <Link href="https://warpcast.com/matthew/0x78b950dc" target="_blank">
+        <Link
+          href="https://warpcast.com/chaskin.eth/0xfd097a26"
+          target="_blank"
+        >
           <button className="bg-slate-800 px-4 py-2 text-sm font-semibold text-white">
             RSVP in Warpcast
           </button>
