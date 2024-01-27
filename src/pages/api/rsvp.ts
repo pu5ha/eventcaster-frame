@@ -135,7 +135,6 @@ export default async function handler(
         }
 `;
 
-      // Fetch data from Airstack
       const { data, error } = await fetchQuery(graphqlQuery, {
         variables: { fid: `fc_fid:${fid}` },
       });
@@ -145,15 +144,13 @@ export default async function handler(
         return res.status(500).send("Error fetching NFT data");
       }
 
-      // Select a random NFT image from the response
       const randomNftImage = selectRandomNFTImage(data);
 
+      // This if-else block should be inside the handler function
       if (randomNftImage) {
-        // Send response with the random NFT image
         return res.send(createHtmlResponse(randomNftImage));
       } else {
-        // Handle case where no image is found
-        // ...
+        return res.status(404).send("No NFT image found for the given FID");
       }
     } catch (error) {
       console.error(error);
