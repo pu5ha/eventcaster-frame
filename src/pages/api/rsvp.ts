@@ -158,8 +158,9 @@ export default async function handler(
     res.status(405).send("Method Not Allowed");
   }
 }
-function selectRandomNFTImage(data: any) {
-  let images = [];
+function selectRandomNFTImage(data: any): string | null {
+  let images: string[] = []; // Explicitly declare the type of the images array
+
   ["Ethereum", "Polygon", "Base", "Zora"].forEach((blockchain) => {
     if (data[blockchain] && data[blockchain].TokenBalance) {
       data[blockchain].TokenBalance.forEach((token: any) => {
@@ -179,7 +180,7 @@ function selectRandomNFTImage(data: any) {
     const randomIndex = Math.floor(Math.random() * images.length);
     return images[randomIndex];
   } else {
-    return null;
+    return null; // Explicitly return null if no images are found
   }
 }
 
